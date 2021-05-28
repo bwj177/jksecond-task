@@ -1,0 +1,23 @@
+from time import time
+def timedecorator(func):
+    def wrapper(*args,**kw):
+        start=time()
+        result=func(*args,**kw)
+        end=time()
+        print("[{}]executed time:{:.8f}ps\nresult={}".format(func.__name__,(end-start)*1000000000000,result))
+        return  result
+    return  wrapper
+#example as follow:
+@timedecorator
+def fibbonacci(x):
+    a,b=1,1
+    count=0
+    lis=[]
+    while True:
+        if count>x:
+            break
+        lis.append(a+b)
+        a,b=b,a+b
+        count+=1
+    return lis[1]
+fibbonacci(5000)
