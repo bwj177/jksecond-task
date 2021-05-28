@@ -1,0 +1,38 @@
+import socket
+def send_mas(udp_socket):    #发送消息的过程
+    mas=input('请输入发送消息：')
+    ip=input("请输入对方的ip地址：")
+    port=int(input("请输入对方的端口号："))
+    udp_socket.sendto(mas.encode("utf-8"),(ip,port))
+def rec_mas(udp_socket):      #接收信息的过程
+    rec_mas=udp_socket.recvfrom(1024)
+    print("%s:%s"%(rec_mas[1],rec_mas[0].decode("gbk")))
+
+def main():
+    udp_socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)  #初始化socket
+    udp_socket.bind(("",8081))   #绑定端口号
+    print("-"*35)
+    print("1:发送信息")
+    print("2:接收信息")
+    print("3：退出聊天")
+    print("-"*35)             #菜单显示
+    while True:
+        menu_code=input("请录入菜单编号：")
+        if menu_code=="1":
+            print("成功调用发送信息的功能")
+            send_mas(udp_socket)
+        elif menu_code=="2":
+            print("成功调用接收信息的功能")
+            rec_mas(udp_socket)
+        elif menu_code=='3':
+            print('退出聊天器成功！')
+            break
+        else:
+            print('录入有误，请重新录入：')
+
+
+main()
+
+
+
+
