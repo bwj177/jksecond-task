@@ -1,0 +1,34 @@
+from socket import socket
+from threading import Thread
+
+connPool = set()   #连接集合
+server = socket()   #创建socket
+server.bind(("localhost",5080)) #绑定地址与端口
+server.listen(5)    #设置最大监听数
+print("服务已启动，正在等待连接......")
+
+def sendAll(data:bytes):
+    for each in connPool:
+        each.send(data)
+
+def connHandle(conn:socket,address):
+    print(address,"已成功连接\n")
+    name = ("ID%d: "%(address[1])).encode()
+    while True:
+        try:
+            recved = conn.recv(4096)
+            sendAll(name + recved)
+            print("[Info]",(name + recved).decode())
+        except:
+            print("[Tip]",address, "已断开连接\n")
+            connPool.remove(conn)  # 从集合中删除连接
+            sendAll(name+"已离开聊天室\n".encode())
+            break
+    conn.close()
+
+while True:
+    conn, address = server.accept()  # 获取连接
+    connPool.add(conn)  #在集合中加入连接
+    t = Thread(target=connHandle,args=(conn,address))   #调用connHandle处理连接
+    t.setDaemon(True)   #设置守护线程
+    t.start()   #运行线程
