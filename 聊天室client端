@@ -1,0 +1,41 @@
+import tkinter as tk
+from socket import socket
+from threading import Thread
+
+client = socket()   #创建socket
+client.connect(("localhost",5080)) #连接地址与端口
+
+
+#创建窗体
+window = tk.Tk()
+window.title('ChatRoom')
+window.resizable(width=False, height=False)
+window.geometry("472x741+724+169")
+#创建聊天栏
+content = tk.StringVar()
+notes = tk.Label(window,textvariable=content,anchor="nw")
+notes.place(x=0,y=0,width=472,height=585)
+#创建发送栏
+chatInput = tk.Text(window,wrap=tk.NONE)
+chatInput.insert(tk.END,'')
+chatInput.place(x=2,y=600,width=358,height=134)
+#创建发送按钮
+sendBtn = tk.Button(window,text="发送")
+sendBtn.place(x=374,y=626,width=83,height=92)
+def sendMessage(event): #创建发送信息函数
+    if chatInput.get("0.0","end") != "\n":
+        message:str = chatInput.get("0.0","end")
+        chatInput.delete("0.0","end")
+        client.send(message.encode())
+sendBtn.bind("<Button-1>",sendMessage)
+
+#监听信息
+def listenChat():
+    while True:
+        recved = client.recv(4096)
+        content.set(content.get()+recved.decode())
+t = Thread(target=listenChat)
+t.setDaemon(True)
+t.start()
+#启动窗体
+window.mainloop()
